@@ -3,6 +3,18 @@
 
 int N;
 
+void show(std::vector<item> items, std::vector<std::pair<int, int>> dependencies, int B, int M){
+     std::cout << N << " " << B << '\n';
+    for (int i = 0; i < N; i++) {
+        std::cout << items[i].weight << " " << items[i].value << "\n";
+    }
+    std::cout << "\n" << M << "\n";
+    for(int i = 0; i < M; i++) {
+        std::cout << dependencies[i].first << " " << dependencies[i].second << "\n";
+    }
+    std::cout << "\n";
+}
+
 int main(int argc, char *argv[]) {
 
     std::string algorithm = std::string(argv[1]);
@@ -24,31 +36,17 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < M; i++) {
         data >> dependencies[i].first >> dependencies[i].second;
     }
-
-    std::vector<bool> solution(N); //już jest wypełnione zerami
-    for (int i = 0; i < N; i++) {
-        std::cout << solution[i] << " ";
-    }
-    //std::cout << N << " " << B << '\n';
-    for (int i = 0; i < N; i++) {
-        std::cout << items[i].weight << " " << items[i].value << "\n";
-    }
-    //std::cout << "\n" << M << "\n";
-    for(int i = 0; i < M; i++) {
-        std::cout << dependencies[i].first << " " << dependencies[i].second << "\n";
-    }
-    //std::cout << "\n";
+   
     Result result(N);
-    //result = 
-    bruteForce(B, items, dependencies);
-    // std::cout << "Max. value: "<< result.value << " ";
-    // std::cout << "Chosen items:\n";
-    // for (int i = 0; i < N; i++) {
-    //     if (result.arr[i] == 1) {
-    //         std::cout << i+1 << " ";
-    //     }
-    // }
-    // std::cout << "\n";
+    result = bruteForce(B, items, dependencies);
+    std::cout << "Max. value: "<< result.value << "\n";
+    std::cout << "Chosen items: ";
+    for (int i = 0; i < N; i++) {
+        if (result.arr[i] == 1) {
+            std::cout << i << " ";
+        }
+    }
+    std::cout << "\n";
 }
 
 // plik wyglada tak
