@@ -15,6 +15,10 @@ struct item{
 struct Result{
     int value;
     std::vector<bool> arr;
+
+    Result(size_t N) {
+        arr.resize(N, false);  // Resize the vector to N elements
+    }
 };
 
 #endif

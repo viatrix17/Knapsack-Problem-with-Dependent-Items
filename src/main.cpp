@@ -1,6 +1,8 @@
 #include "../include/define_include.h"
 #include "../include/bf.h"
 
+int N;
+
 int main(int argc, char *argv[]) {
 
     std::string algorithm = std::string(argv[1]);
@@ -8,13 +10,12 @@ int main(int argc, char *argv[]) {
     
     data.open(argv[1]);
 
-    int N,B,M; //ilosc przedmiotow i pojemnosc plecaka
+    int B, M; //the capacity of the knapsack and the number of dependencies
     data >> N >> B;
 
     std::vector<item> items(N);
     for (int i = 0; i < N; i++) { //wczytywanie wag i wartosci
         data >> items[i].weight >> items[i].value;
-        //std::cout << items[i].weight << " " << items[i].value << "\n";
     }
 
     //wycztywanie zależności
@@ -22,15 +23,32 @@ int main(int argc, char *argv[]) {
     std::vector<std::pair<int, int>> dependencies(M);
     for (int i = 0; i < M; i++) {
         data >> dependencies[i].first >> dependencies[i].second;
-        //std::cout << dependencies[i].first << " " << dependencies[i].second << "\n";
     }
 
     std::vector<bool> solution(N); //już jest wypełnione zerami
     for (int i = 0; i < N; i++) {
         std::cout << solution[i] << " ";
     }
-    std::cout << "\n\n";
-    std::cout << bruteForce(N, B, items, dependencies) << "\n";
+    //std::cout << N << " " << B << '\n';
+    for (int i = 0; i < N; i++) {
+        std::cout << items[i].weight << " " << items[i].value << "\n";
+    }
+    //std::cout << "\n" << M << "\n";
+    for(int i = 0; i < M; i++) {
+        std::cout << dependencies[i].first << " " << dependencies[i].second << "\n";
+    }
+    //std::cout << "\n";
+    Result result(N);
+    //result = 
+    bruteForce(B, items, dependencies);
+    // std::cout << "Max. value: "<< result.value << " ";
+    // std::cout << "Chosen items:\n";
+    // for (int i = 0; i < N; i++) {
+    //     if (result.arr[i] == 1) {
+    //         std::cout << i+1 << " ";
+    //     }
+    // }
+    // std::cout << "\n";
 }
 
 // plik wyglada tak
