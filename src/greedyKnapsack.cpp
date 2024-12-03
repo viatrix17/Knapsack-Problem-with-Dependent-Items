@@ -27,7 +27,7 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
         if (items[perm[i]-1].weight <= capacity) {
             capacity -= items[perm[i]-1].weight;
             finalvalue += items[perm[i]-1].value;
-            solution[i] = 1;
+            solution[items[perm[i]-1].number-1] = 1;
         }
     }
 
