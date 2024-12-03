@@ -1,7 +1,21 @@
 #include "../include/define_include.h"
 #include "../include/bf.h"
+#include "../include/greedyKnapsack.h"
 
 int N;
+
+void showResult(Result result, std::string title){
+    std::cout << title << "\n";
+    std::cout << "Max. value: "<< result.value << "\n";
+    std::cout << "Chosen items: ";
+    for (int i = 0; i < N; i++) {
+        if (result.arr[i] == 1) {
+            std::cout << i << " ";
+        }
+    }
+    std::cout << "\n";
+
+}
 
 void show(std::vector<item> items, std::vector<std::pair<int, int>> dependencies, int B, int M){
      std::cout << N << " " << B << '\n';
@@ -39,14 +53,10 @@ int main(int argc, char *argv[]) {
    
     Result result(N);
     result = bruteForce(B, items, dependencies);
-    std::cout << "Max. value: "<< result.value << "\n";
-    std::cout << "Chosen items: ";
-    for (int i = 0; i < N; i++) {
-        if (result.arr[i] == 1) {
-            std::cout << i << " ";
-        }
-    }
-    std::cout << "\n";
+    showResult(result, "Brute Force");
+    result = greedyKnapsack(B, items, dependencies);
+    showResult(result, "Greedy Knapsack");
+    
 }
 
 // plik wyglada tak
@@ -66,4 +76,5 @@ int main(int argc, char *argv[]) {
 // 3 1
 
 
-
+//GRAFY SORTOWANIE TOPOLOGICZNE -> wykrywanie na samym początku czy jest cykl, wtedy nie ma takiego ustawienia, ale to tylko dziala jesli myslimy o ustawieniu wszystkich przedmiotow
+//grafy wykrywanie sciezki
