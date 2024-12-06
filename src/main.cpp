@@ -10,7 +10,7 @@ void showResult(Result result, std::string title){
     std::cout << "Chosen items: ";
     for (int i = 0; i < N; i++) {
         if (result.arr[i] == 1) {
-            std::cout << i << " ";
+            std::cout << i+1 << " ";
         }
     }
     std::cout << "\n";
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     std::vector<item> items(N);
     for (int i = 0; i < N; i++) { //wczytywanie wag i wartosci
-        data >> items[i].weight >> items[i].value;
+        data >> items[i].number >> items[i].weight >> items[i].value;
     }
 
     //wycztywanie zależności
@@ -52,9 +52,10 @@ int main(int argc, char *argv[]) {
     }
    
     Result result(N);
-    result = bruteForce(B, items, dependencies);
-    showResult(result, "Brute Force");
-    result = greedyKnapsack(B, items, dependencies);
+    //result = bruteForce(B, items, dependencies);
+    //showResult(result, "Brute Force");
+    result = greedyDependentKnapsack(B, items, dependencies, 1);
+    std::cout <<"greedy\n";
     showResult(result, "Greedy Knapsack");
     
 }
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]) {
 // (2) 7 2
 // (3) 2 5
 // 2
-// 2 0
+// 2 0          2 nie moze byc przed 0
 // 3 1
 
 

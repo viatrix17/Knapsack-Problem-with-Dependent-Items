@@ -3,7 +3,9 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <list>
+#include <sstream>
+#include <stack>
+#include <set>
 
 #ifndef DEFINE_INCLUDE
 #define DEFINE_INCLUDE
@@ -24,7 +26,9 @@ struct Result {
 };
 
 struct graph{
-    std::list <int> next;
+    std::vector <int> next;
+    int weight;
+    int value;
 };
 
 #endif
