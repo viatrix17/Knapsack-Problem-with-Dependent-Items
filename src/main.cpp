@@ -4,13 +4,18 @@
 
 int N;
 
-void showResult(Result result, std::string title){
+void showResult(Result result, std::string title) {
     std::cout << title << "\n";
     std::cout << "Max. value: "<< result.value << "\n";
     std::cout << "Chosen items: ";
-    for (int i = 0; i < N; i++) {
-        if (result.arr[i] == 1) {
-            std::cout << i+1 << " ";
+    if (std::accumulate(result.arr.begin(), result.arr.end(),0) == 0) {
+        std::cout << "No items can be chosen.\n";
+    }
+    else {
+        for (int i = 0; i < N; i++) {
+            if (result.arr[i] == 1) {
+                std::cout << i+1 << " ";
+            }
         }
     }
     std::cout << "\n";
@@ -31,6 +36,8 @@ void show(std::vector<item> items, std::vector<std::pair<int, int>> dependencies
 
 int main(int argc, char *argv[]) {
 
+    if(argc == 1) exit(0);
+    std::cout <<"weslzo\n";
     std::string algorithm = std::string(argv[1]);
     std::fstream data;
     
@@ -55,7 +62,6 @@ int main(int argc, char *argv[]) {
     //result = bruteForce(B, items, dependencies);
     //showResult(result, "Brute Force");
     result = greedyDependentKnapsack(B, items, dependencies, 1);
-    std::cout <<"greedy\n";
     showResult(result, "Greedy Knapsack");
     
 }
