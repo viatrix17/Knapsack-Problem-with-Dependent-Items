@@ -34,16 +34,25 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
         std::cout << "po transformacji:\n";
         show(GCycle, N+cycles.size());
         perm = topologicalSort(N+cycles.size(), GCycle, items);
+        // std::cout << "permutation:\n";
+        // for(int i = 0; i < perm.size(); i++) {
+        //     std::cout << perm[i] << " ";
+        // }
+        std::cout << "\n";
         for (long unsigned int i = 0; i < perm.size(); i++) {
             if (perm[i] >= N) {
-                std::cout << "Cykl!\n";
-                if (GCycle[perm[i]-1].weight <= capacity) {
-                    capacity -= GCycle[perm[i]-1].weight;
-                    finalValue += GCycle[perm[i]-1].value;
-                    pom = 0;
+                //std::cout << "Cykl!\n";
+               // std::cout << perm[i] << " " << GCycle[perm[i]].weight << " " << GCycle[perm[i]].value << " " << capacity << "\n";
+                if (GCycle[perm[i]].weight <= capacity) {
+                    //std::cout << "ok\n";
+                    capacity -= GCycle[perm[i]].weight;
+                    finalValue += GCycle[perm[i]].value;
+                    //std::cout << finalValue << "\n";
+                    pom = N;
                     for (auto it = cycles.begin(); it != cycles.end(); it++) {
-                        if (pom == perm[i]-1) {
+                        if (pom == perm[i]) {
                             for (auto vertice = it->begin(); vertice != it->end(); vertice++) {
+                                //std::cout << "dodajemy do rozwiazania: " << vertice->number << " ";
                                 solution[vertice->number-1] = 1;
                             }
                             break;
@@ -53,11 +62,11 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
                 }
             } 
             else {
-                std::cout << "Nie-cykl!\n";
-                if (items[perm[i]-1].weight <= capacity) {
-                    capacity -= items[perm[i]-1].weight;
-                    finalValue += items[perm[i]-1].value;
-                    solution[items[perm[i]-1].number-1] = 1;
+                //std::cout << "Nie-cykl!\n";
+                if (items[perm[i]].weight <= capacity) {
+                    capacity -= items[perm[i]].weight;
+                    finalValue += items[perm[i]].value;
+                    solution[perm[i]] = 1;
                 }
 
             }
@@ -69,18 +78,17 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
         perm = topologicalSort(N, G, items); 
         //std::cout << perm.size() << "\n";
         for (long unsigned int i = 0; i < perm.size(); i++) {
-            std::cout << items[perm[i]-1].number << " " << items[perm[i]-1].weight << " " << items[perm[i]-1].value << "\n";
-            if (items[perm[i]-1].weight <= capacity) {
+            std::cout << items[perm[i]].number << " " << items[perm[i]].weight << " " << items[perm[i]].value << "\n";
+            if (items[perm[i]].weight <= capacity) {
                 //std::cout << "wchodzi"
-                capacity -= items[perm[i]-1].weight;
-                finalValue += items[perm[i]-1].value;
-                solution[items[perm[i]-1].number-1] = 1;
+                capacity -= items[perm[i]].weight;
+                finalValue += items[perm[i]].value;
+                solution[perm[i]] = 1;
             }
         }
     }
 
-    std::cout << "Greedy Algorithm Done\n";
-
+    std::cout << "Greedy Algorithm Done.\n" << finalValue << "\n";
     //usuwanie Listy
     //delete G; 
     //delete GCycle;

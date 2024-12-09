@@ -70,13 +70,13 @@ void isCyclic(graph *L, const std::vector<item> items, std::set<std::set<item>> 
     for (int j = 0; j < N; j++) {
         visited[j] = 0;
     }
-    // for (std::set<std::set<item>>::iterator it = cycles.begin(); it != cycles.end(); it++) {
-    //     std::cout << "numer cyklu: " << 0 << "\n";
-    //     for (std::set<item>::iterator vertice = it->begin(); vertice != it->end(); vertice++) {
-    //         std::cout << vertice->number << " ";
-    //     }
-    //     std::cout << "\n";
-    // }
+    for (std::set<std::set<item>>::iterator it = cycles.begin(); it != cycles.end(); it++) {
+        std::cout << "numer cyklu: " << 0 << "\n";
+        for (std::set<item>::iterator vertice = it->begin(); vertice != it->end(); vertice++) {
+            std::cout << vertice->number << " ";
+        }
+        std::cout << "\n";
+    }
     //łączenie cykli
     delete[] visited;
 }
@@ -87,52 +87,73 @@ void show(graph *G, int len){
         for (int j = 0; j < G[i].next.size(); j++) {
             std::cout << G[i].next[j]<< " ";
         }
-        std::cout << "\n";
+        std::cout << "\t\t" << G[i].weight << " " << G[i].value << "\n";
     }  
 }
 
 graph *transformGraph(graph *oldG, std::set<std::set<item>> &cycles) {
     
     graph *newG;
-    newG = new graph[2*N];
-    bool *visited; 
-    visited = new bool[N+cycles.size()];
-    for (int i = 0; i < N; i++) {
-        visited[i] = 0;
+    newG = new graph[N+cycles.size()];
+    std::vector<std::pair<bool, int>> visited(N+cycles.size());
+    for (int i = 0; i < N+cycles.size(); i++) {
+        visited[i].first = 0;
+        visited[i].second = -1;
     }
-    int sumWeight, sumValue, a = 0;
+    int sumWeight, sumValue, pom = 0, searchVertice;
     
     for (std::set<std::set<item>>::iterator it = cycles.begin(); it != cycles.end(); it++) {
-        sumWeight = 0;
-        sumValue = 0;
-        for (std::set<item>::iterator vertice = it->begin(); vertice != it->end(); vertice++) {
-            sumWeight += vertice->weight;
-            sumValue += vertice->value;
-            visited[vertice->number-1] = 1;
-            for (int i = 0; i < N; i++) {
-                for (long unsigned int j = 0; j < oldG[i].next.size(); j++) {
-                    if (oldG[i].next[j] == vertice->number) { //szukanie poprzedników nienalezacych do cyklu dodac
-                        newG[N+a].next.push_back(vertice->number);
-                    }
-                }
-                //te ktore są w cyklach to -1
-            }
+        for (std::set<item>::iterator vertice = it->begin(); vertice != it->end(); vertice++) { //idzie po wierzcholkach w cyklu
+            //std::cout << "vertice in a cycle: " << vertice->number-1 << "\n";
+            visited[vertice->number-1].first = 1;
+            visited[vertice->number-1].second = pom;
+            //jesli jest czescia jakiegos cyklu, to wtedy ma -1 w nowym grafie
             newG[vertice->number-1].next.push_back(-1);
+            newG[N+pom].weight += oldG[vertice->number-1].weight;
+            newG[N+pom].value += oldG[vertice->number-1].value;
+            newG[vertice->number-1].weight = 0;
+            newG[vertice->number-1].value = 0;
         }
-        newG[N+a].weight = sumWeight;
-        newG[N+a].value = sumValue;
-        //std::cout << newG[N+a].weight << " " << newG[N+a].value << "\n";
-        a++;
+        pom++;
     }
-    
+
     for (int i = 0; i < N; i++) {
-        if (!visited[i]) {
-            newG[i] = oldG[i];
+        if (visited[i].second == -1) {//nie nalezy do cyklu zadnego to przepisz dane
+            newG[i].value = oldG[i].value;
+            newG[i].weight = oldG[i].weight;
         }
+        //std::cout << visited[i].first << " " << visited[i].second << "\n";
     }
-    //show(oldG, N);
-    //std::cout << "new:\n";
-    //show(newG, N+cycles.size());
+
+    for (int i = 0; i < N; i++) {
+        //std::cout << "vertice: " << i << "\n";
+        for (int j = 0; j < oldG[i].next.size(); j++) {
+        //std::cout << "successors: " << oldG[i].next[j] << " " << visited[oldG[i].next[j]].second << "\n";
+            if (visited[oldG[i].next[j]].second == -1 ) { //nie nalezy do zadnego cyklu i jeszcze nie bylo odwiedzone
+                //std::cout << "Nie nalezy do zadnego cyklu\n";
+                if (visited[oldG[i].next[j]].first == 0) {
+                    //std::cout << "isn't a part of any cycle and hasn't been visited yet\n";
+                    newG[i].next.push_back(j);
+                    visited[oldG[i].next[j]].first = 1;
+                }
+            }
+            else if (visited[oldG[i].next[j]].second != visited[i].second) { //jesli nalezy do cyklu ale jest to cykl inny to podepnij ten cykl
+                //std::cout << "is the part of a different cycle: " << visited[j].second << "\n";
+                newG[i].next.push_back(visited[j].second);
+                visited[j].first = 1;
+                visited[visited[j].second].first = 1;
+            }
+            // else if (visited[oldG[i].next[j]].second == visited[i].second) {
+            //     std::cout << "is the part of the same cycle\n";
+            // }
+            for(int a = 0; a < N+cycles.size(); a++) {
+                visited[a].first = 0;
+            }
+        }
+        //std::cout << "\n";
+    }
+  
+    //delete visited;
     return newG;
 }
 
@@ -143,86 +164,101 @@ std::vector<int> topologicalSort (int size, graph *G, const std::vector<item> it
 
     std::vector <int> sortedGraph;
 
-    int *ins, *visited;
-    ins = new int[size]; visited = new int[size];
-
-    for(int i = 0; i < size; i++){
-        ins[i] = 0;
-        visited[i] = 0;
-    }
+    std::vector<int> ins(size);
+    std::vector<int> visited(size);
+    
     int inCount = 0;
     graph *gCopy;
     gCopy = G;
-    //std::cout << "Kopia listy zrobiona:\n";
+    std::cout << "Kopia listy zrobiona:\n";
     //show(gCopy, size);
     std::cout << "\n";
 
     for (int i = 0; i < size; i++) {
-        if (gCopy[i].next[0] != -1) {
+        //std::cout << i << " ";
+        if (!gCopy[i].next.empty()) {
+            if (gCopy[i].next[0] != -1) {
             for (int j = 0; j < gCopy[i].next.size(); j++) {
-                std::cout << gCopy[i].next[j] << "\n";
+                //std::cout << gCopy[i].next[j] << "\n";
                 if (gCopy[j].next[0] != -1) {
-                    ins[gCopy[i].next[j]-1]++;
+                    ins[gCopy[i].next[j]]++;
                     inCount++;
                 }
             }
-        }
-        else {
-            ins[i] = -1;
+            }
+            else {
+                ins[i] = -1;
             visited[i] = 1;
+            }
         }
+       
     }
-    std::cout << "inCount = " << inCount << "\n";
-    for (int i = 0; i < size; i++) {
-        std::cout << i << " " << ins[i] << "\n";
-    }
-    std::cout << "\n";
+    //std::cout << "inCount = " << inCount << "\n\tvisited:\tins:\n";
+    // for (int i = 0; i < size; i++) {
+    //     std::cout << i << "\t" << visited[i] << "\t\t" << ins[i] << "\n";
+    // }
+    // std::cout << "\n";
  
-    while (inCount >= 0) {
+    int indexRemove;
+    double maxRatio;
+    //std::cout << std::accumulate(visited.begin(), visited.end(), 0) << "\n";
+    while (std::accumulate(visited.begin(), visited.end(), 0) != size) {
+        maxRatio = 0.0;
+        indexRemove = -1;
+        for (int i = 0; i < size; i++) {
+            if (ins[i] == 0 && visited[i] == 0) {
+                double ratio = static_cast<double>(gCopy[i].value) / gCopy[i].weight;
+                //std::cout << i << "\tRatio = " << ratio << "\n";                
+                if (ratio > maxRatio) {
+                    maxRatio = ratio;
+                    indexRemove = i;
+                }
+            }
+        }
         //ma brac najwiekszy po ilorazie z tych nieodwiedzonych, gdzie ins == 0
-        auto indexRemove = std::max_element(items.begin(), items.end(), [&visited, &items, &ins, &gCopy](const item& a, const item& b) {
-            int indexA = &a - &items[0];
-            int indexB = &b - &items[0];
+        // auto indexRemove = std::max_element(items.begin(), items.end(), [&visited, &items, &ins, &gCopy](const item& a, const item& b) {
+        //     int indexA = &a - &items[0];
+        //     int indexB = &b - &items[0];
 
-        // Oblicz iloraz wartości do wagi tylko dla przedmiotów nieodwiedzonych
+        // // Oblicz iloraz wartości do wagi tylko dla przedmiotów nieodwiedzonych
             
-            if (visited[indexA]) {
-                //std::cout << "removed " << indexA+1 << " due to being visited and " << indexB+1 << " was picked\n";
-                return true; 
-            }
-            if (ins[indexA] > 0) {
-                //std::cout << "removed " << indexA+1 << " due to having ins > 0 and " << indexB+1 << " was picked\n";
-                return true;
-            }
+        //     if (visited[indexA]) {
+        //         std::cout << "removed " << indexA+1 << " due to being visited and " << indexB+1 << " was picked\n";
+        //         return true; 
+        //     }
+        //     if (ins[indexA] > 0) {
+        //         std::cout << "removed " << indexA+1 << " due to having ins > 0 and " << indexB+1 << " was picked\n";
+        //         return true;
+        //     }
             
-            if (visited[indexB]) {
-                //std::cout << "removed " << indexB+1 << " due to being visited and " << indexA+1 << " was picked\n";
-                return false;
-            }
-            if (ins[indexB] > 0) {
-                //std::cout << "removed " << indexB+1 << " due to having ins > 0 and " << indexA+1 << " was picked\n";
-                return false;
-            }
+        //     if (visited[indexB]) {
+        //         std::cout << "removed " << indexB+1 << " due to being visited and " << indexA+1 << " was picked\n";
+        //         return false;
+        //     }
+        //     if (ins[indexB] > 0) {
+        //         std::cout << "removed " << indexB+1 << " due to having ins > 0 and " << indexA+1 << " was picked\n";
+        //         return false;
+        //     } //do poprawki zeby bralo wierzcholki z grafu
             
             
 
-            return a.value * b.weight < b.value * a.weight;
-        });
-
-        if (indexRemove != items.end()) {
-            std::cout << "ToRemove: " << indexRemove->number << "\n";
-            if(!gCopy[indexRemove->number-1].next.empty() && gCopy[indexRemove->number-1].next[0] != -1) {
-                    std::cout << indexRemove->number << ": ";
-                    for (int j = 0; j < gCopy[indexRemove->number-1].next.size(); j++) {
+        //     return a.value * b.weight < b.value * a.weight;
+        // });
+        //std::cout << indexRemove << "\n";
+        if (indexRemove != -1) {
+            std::cout << "ToRemove: " << indexRemove << "\n";
+            if(!gCopy[indexRemove].next.empty() && gCopy[indexRemove].next[0] != -1) {
+                    for (int j = 0; j < gCopy[indexRemove].next.size(); j++) {
                         //std::cout << " " << j << " ";
-                        ins[gCopy[indexRemove->number-1].next[j]]--;
+                        ins[gCopy[indexRemove].next[j]]--;
                         //std::cout << ins[gCopy[indexRemove->number-1].next[j]] << "\n";
                     }
-                gCopy[indexRemove->number-1].next.clear();
+                gCopy[indexRemove].next.clear();
             }
-            visited[indexRemove->number-1] = 1;
-            sortedGraph.push_back(indexRemove->number);
-            inCount--;
+            visited[indexRemove] = 1;
+            //std::cout << std::accumulate(visited.begin(), visited.end(), 0) << "\n";
+            sortedGraph.push_back(indexRemove); //w permutacji niech tez beda indeksy, w wyniku sie to zmieni
+            //inCount--;
         }
     }
     //show(gCopy, size);
@@ -233,7 +269,6 @@ std::vector<int> topologicalSort (int size, graph *G, const std::vector<item> it
     }
     std::cout << "\n";
 
-    delete[] ins; delete[] visited;
     return sortedGraph;  //zwraca permutacje
 }
 
