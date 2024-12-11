@@ -48,4 +48,43 @@ struct antGraph {
     double pheromoneLevel;
 };
 
+class pheromoneItemSelector {
+    public:
+   
+    void adjust(antGraph *G, std::vector<int> verSet) { 
+        if (verSet.empty()) {
+            pherRange.clear();
+        }  
+        else {
+            pherRange.resize(verSet.size()); //zeby wybieralo tylko z tych dostepnych
+            pherRange[0] = G[0].pheromoneLevel;
+            for (size_t i = 1; i < verSet.size(); i++) {
+                pherRange[i] = pherRange[i-1] + G[verSet[i]].pheromoneLevel;
+            }
+            total = pherRange.back();
+            std::cout << "Range:\n";
+            for (int i = 0; i < pherRange.size(); i++) {
+                std::cout << pherRange[i] << " ";
+            }
+            std::cout << "\n";
+        }
+    }
+    int selectItem() {
+        std::random_device rd;
+        std::mt19937 gen(rd());  // Mersenne Twister engine
+        std::uniform_int_distribution<> dist(0, total - 1);
+        double randNum = dist(gen);
+
+        // Use binary search to find the index where randNum fits in cumulative sums
+        auto it = std::lower_bound(pherRange.begin(), pherRange.end(), randNum + 1);
+        return std::distance(pherRange.begin(), it);  // Index of the selected pheromon
+    }
+
+    private:
+    std::vector<double> pherRange;
+    double total;
+};
+
 #endif
+
+//zrobic klasy na grafy

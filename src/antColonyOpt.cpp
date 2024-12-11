@@ -4,16 +4,6 @@
 int extern N;
 int extern B;
 
-int selectItem(antGraph *G, std::vector<int> verSet) {
-
-    //bierze jakis losowy na razie, potem to bedzie zalezne od feromonow jakos
-    //jak wybierze ten 
-    if (!verSet.empty()) {
-        return verSet[rand() % verSet.size()];
-    }
-    return -1;
-}
-
 bool allPrevsVisited(std::vector<int> vertice, std::vector<bool> visited) {
     for (int i = 0; i < vertice.size(); i++) {
         //std::cout << visited[vertice[i]] << "\n";
@@ -49,13 +39,15 @@ void possibleVertices(std::vector<std::vector<int>> prevG, std::vector<int> &acc
             accVer.push_back(i);
         }    
     }
+    showVer(accVer);
 }
 
-void addToKnapsack(int &capacity, const std::vector<item> items, int I, int &finalValue) {
+void addToKnapsack(int &capacity, const std::vector<item> items, int I, int &finalValue, antGraph *G) {
     if (items[I].weight <= capacity) {
         std::cout << "Przedmiot " << I << " wszedł do plecaka\n";
         capacity -= items[I].weight;
         finalValue += items[I].value;
+        G[I].pheromoneLevel += items[I].value;
     }
 }
 
@@ -65,11 +57,11 @@ void antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int
     Result result(N);
     antGraph *G;
     G = new antGraph[N];
-    std::vector<std::vector<int>> prevG(N);
-    
-
+    std::vector<std::vector<int>> prevG(N); 
     std::vector<int> acceptableVertices;
     antGraphCreate(G, prevG, items, dependencies);
+    pheromoneItemSelector selector;
+
    
     int nextItem;
     for (int i = 0; i < iterations; i++) {
@@ -80,27 +72,39 @@ void antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int
             std::cout << "ant = " << a << "\n";
             capacity = B;
             possibleVertices(prevG, acceptableVertices, visited);
-            showVer(acceptableVertices);
-            currentItem = selectItem(G, acceptableVertices);
-            addToKnapsack(capacity, items, currentItem, finalValue);
-            visited[currentItem] = 1;
+            //showVer(acceptableVertices);
+            selector.adjust(G, acceptableVertices);
+            //showVer(acceptableVertices);
+            currentItem = selector.selectItem();
+            std::cout << "chosen item: " << acceptableVertices[currentItem] << "\n";
+            addToKnapsack(capacity, items, acceptableVertices[currentItem], finalValue, G);
+            visited[acceptableVertices[currentItem]] = 1;
             //bulshow(visited);
             while (capacity > 0) {
                 std::cout << "keeps checking for more items...\n";
                 possibleVertices(prevG, acceptableVertices, visited);
                 //showVer(acceptableVertices);
-                //tworzymy zbior wierzcholków, które nie mają nieodwiedzonych poprzedników
-                nextItem = selectItem(G, acceptableVertices);
-                if (nextItem == -1) { //nie ma nic do wybrania juz
+                if (acceptableVertices.empty()) { //nie ma nic do wybrania juz
                     break;
                 }
-                addToKnapsack(capacity, items, nextItem, finalValue);
-                visited[nextItem] = 1;
+                selector.adjust(G, acceptableVertices);
+                nextItem = selector.selectItem();
+                addToKnapsack(capacity, items, acceptableVertices[nextItem], finalValue, G);
+                visited[acceptableVertices[nextItem]] = 1;
                 //bulshow(visited);
             }
+            for (int f = 0; f < N; f++) {
+                std::cout << G[f].pheromoneLevel << "\n";
+            }
 
+        }
+       
+        for (int f = 0; f < N; f++) {
+            G[f].pheromoneLevel *= 0.9;
         }
     }
     delete[] G;
     //return result;
 }
+
+//dodac update'owanie feromonów z zyskiem
