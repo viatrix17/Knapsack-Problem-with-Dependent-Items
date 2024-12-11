@@ -9,8 +9,8 @@ std::vector<bool> checkPermutation(int n, int capacity, const std::vector<item> 
     int tempWeight;
     std::vector<bool> solution(N);
     for(long unsigned int i = 0; i < dependencies.size(); i++) { //sprawdzic wszystkie warunki
-        auto pos1 = std::find(subset.begin(), subset.end(), dependencies[i].second+1); 
-        auto pos2 = std::find(subset.begin(), subset.end(), dependencies[i].first+1);  //3 nie moze byc przed 1 i 4 przed 2
+        auto pos1 = std::find(subset.begin(), subset.end(), dependencies[i].second-1); 
+        auto pos2 = std::find(subset.begin(), subset.end(), dependencies[i].first-1);  //3 nie moze byc przed 1 i 4 przed 2
         if (pos1 > pos2 && pos1 != subset.end() && pos2 != subset.end()) {                
             valid = false;
             break;
@@ -24,7 +24,7 @@ std::vector<bool> checkPermutation(int n, int capacity, const std::vector<item> 
                 
         if (tempWeight <= capacity) { 
             check = true;
-            // std::cout << "Valid permutation: ";
+            //std::cout << "Valid permutation: ";
             for (int idx : subset) {
                 //std::cout << idx-1 << " ";
                 solution[idx-1] = 1;
@@ -45,7 +45,7 @@ Result bruteForce(int capacity, const std::vector<item> items, const std::vector
     std::vector<int> indices;
     std::vector<bool> tempSolution(N);
     for(int i = 0; i < N; i++) {
-        indices.push_back(i+1);
+        indices.push_back(i);
     }
     for (int length = 1; length <= N; ++length) {
         std::vector<bool> v(indices.size());

@@ -57,7 +57,7 @@ class pheromoneItemSelector {
         }  
         else {
             pherRange.resize(verSet.size()); //zeby wybieralo tylko z tych dostepnych
-            pherRange[0] = G[0].pheromoneLevel;
+            pherRange[0] = G[verSet[0]].pheromoneLevel;
             for (size_t i = 1; i < verSet.size(); i++) {
                 pherRange[i] = pherRange[i-1] + G[verSet[i]].pheromoneLevel;
             }

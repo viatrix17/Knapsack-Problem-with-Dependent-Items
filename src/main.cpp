@@ -38,7 +38,6 @@ void showData(std::vector<item> items, std::vector<std::pair<int, int>> dependen
 int main(int argc, char *argv[]) {
 
     if(argc == 1) exit(0);
-    std::cout <<"weslzo\n";
     std::string algorithm = std::string(argv[1]);
     std::fstream data;
     
@@ -62,11 +61,11 @@ int main(int argc, char *argv[]) {
     //showData(items, dependencies, B, M);
   
     Result result(N);
-    result = bruteForce(B, items, dependencies);
+    //result = bruteForce(B, items, dependencies);
     //showResult(result, "Brute Force");
-    //result = greedyDependentKnapsack(B, items, dependencies, 1);
-    //showResult(result, "Greedy Knapsack");
-    antAlgorithm(items, dependencies);
+    result = greedyDependentKnapsack(B, items, dependencies);
+    showResult(result, "Greedy Knapsack");
+    //antAlgorithm(items, dependencies); //bez cykli
     
 }
 
