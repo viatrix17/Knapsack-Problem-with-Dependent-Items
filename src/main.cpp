@@ -1,8 +1,9 @@
 #include "../include/define_include.h"
 #include "../include/bf.h"
 #include "../include/greedyKnapsack.h"
+#include "../include/antColonyOpt.h"
 
-int N;
+int N, B;
 
 void showResult(Result result, std::string title) {
     std::cout << title << "\n";
@@ -22,7 +23,7 @@ void showResult(Result result, std::string title) {
 
 }
 
-void show(std::vector<item> items, std::vector<std::pair<int, int>> dependencies, int B, int M){
+void showData(std::vector<item> items, std::vector<std::pair<int, int>> dependencies, int B, int M){
      std::cout << N << " " << B << '\n';
     for (int i = 0; i < N; i++) {
         std::cout << items[i].weight << " " << items[i].value << "\n";
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     
     data.open(argv[1]);
 
-    int B, M; //the capacity of the knapsack and the number of dependencies
+    int M; //the capacity of the knapsack and the number of dependencies
     data >> N >> B;
 
     std::vector<item> items(N);
@@ -57,12 +58,15 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < M; i++) {
         data >> dependencies[i].first >> dependencies[i].second;
     }
-   
+
+    //showData(items, dependencies, B, M);
+  
     Result result(N);
-    //result = bruteForce(B, items, dependencies);
+    result = bruteForce(B, items, dependencies);
     //showResult(result, "Brute Force");
-    result = greedyDependentKnapsack(B, items, dependencies, 1);
-    showResult(result, "Greedy Knapsack");
+    //result = greedyDependentKnapsack(B, items, dependencies, 1);
+    //showResult(result, "Greedy Knapsack");
+    antAlgorithm(items, dependencies);
     
 }
 

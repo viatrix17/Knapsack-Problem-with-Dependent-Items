@@ -3,15 +3,28 @@
 
 extern int N; //liczba wierzchołków
 
-void createGraph(graph *L, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
-
+void antGraphCreate(antGraph *G, std::vector<std::vector<int>> &prevG, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
+    std::cout << "Tworzenie grafów:\nDodawanie feromonów początkowych:\n";
     for (long unsigned int i = 0; i < items.size(); i++) {
-        L[i].weight = items[i].weight;
-        L[i].value = items[i].value;
+        G[i].pheromoneLevel = 1.0;
     }
+    std::cout << "Dodawanie krawędzi:\n";
     for (long unsigned int i = 0; i < dependencies.size(); i++) {
-        //std::cout << dependencies[i].first-1 << " " << dependencies[i].second-1 << "\n";
-        L[items[dependencies[i].second-1].number-1].next.push_back(items[dependencies[i].first-1].number-1);
+        //std::cout << i << "\t\t" << dependencies[i].second << " " << items[dependencies[i].second-1].number << "\t" << dependencies[i].first << " " << items[dependencies[i].first-1].number << "\n";
+        G[dependencies[i].second-1].n.push_back(dependencies[i].first-1);
+        prevG[dependencies[i].first-1].push_back(dependencies[i].second-1);
+    }
+}
+
+void createGraph(graph *G, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
+
+    for (long unsigned int i = 0; i < N; i++) {
+        G[i].weight = items[i].weight;
+        G[i].value = items[i].value;
+    }
+    
+    for (long unsigned int i = 0; i < dependencies.size(); i++) {
+        G[dependencies[i].second-1].next.push_back(dependencies[i].first-1);
     }
 }
 

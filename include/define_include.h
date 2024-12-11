@@ -7,6 +7,7 @@
 #include <stack>
 #include <set>
 #include <numeric>
+#include <random>
 
 #ifndef DEFINE_INCLUDE
 #define DEFINE_INCLUDE
@@ -36,10 +37,15 @@ struct Result {
     }
 };
 
-struct graph{
+struct graph {
     std::vector <int> next;
     int weight;
     int value;
+};
+
+struct antGraph {
+    std::vector <int> n;
+    double pheromoneLevel;
 };
 
 #endif

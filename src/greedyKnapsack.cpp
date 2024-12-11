@@ -90,8 +90,8 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
 
     std::cout << "Greedy Algorithm Done.\n" << finalValue << "\n";
     //usuwanie Listy
-    //delete G; 
-    //delete GCycle;
+    delete[] G; 
+    delete GCycle;
     result.arr = solution; 
     result.value = finalValue;
     return result;
