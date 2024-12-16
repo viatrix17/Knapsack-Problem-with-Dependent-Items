@@ -70,26 +70,15 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
     std::set<std::set<item>> cycles; //numer nowego wierzcholka to N+i
     createGraph(G, prevG, items, dependencies);
     std::cout << "Graph was created\n";
-
-    // show(G,N);
-    // std::cout << "\n";
-    // for (int i = 0; i < N; i++) {
-    //     std::cout << i << ": ";
-    //     for(int j = 0; j < prevG[i].size(); j++) {
-    //         std::cout << prevG[i][j] << " ";
-    //     }
-    //     std::cout << "\n";
-    // }
-    
-    //sprawdzic czy zmieni sie kolejnosc items po tym; to mnie nie interesuje bo sortuję graf ale i tak lepiej srpawdzic 
+     
     isCyclic(G, items, cycles);
     std::cout << "Wyszukiwanie cykli zakończone\n";
 
     int pom = 0;
     int finalValue = 0;
-    if (!cycles.empty()) { //jeśli ma cykl to traktuj cykl jako jeden przedmiot, bo nie da sie go rozdzielic
+    if (!cycles.empty()) {
         std::cout << "Graf jest cykliczny.\n";
-        //zmienia graf tak ze wywala te wierzcholki z cykli
+        //zmienia graf tak ze wywala te wierzcholki z cykli i ich nastepnikow
         deleteCycles(G, prevG, cycles);
     }
     else { 

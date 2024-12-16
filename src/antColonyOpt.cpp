@@ -29,31 +29,31 @@ void bulshow(std::vector<bool> ver) {
     std::cout << "\n";
 }
 
-void possibleVertices(std::vector<std::vector<int>> prevG, std::vector<int> &accVer, std::vector<bool> visited, std::vector<bool> added) {
+void possibleVertices(int capacity, std::vector<item> items, std::vector<std::vector<int>> prevG, std::vector<int> &accVer, std::vector<bool> visited, std::vector<bool> added) {
     accVer.clear();
     //showVer(accVer);
-    std::cout << "Tworzenie zbioru dopuszczalnych wierzchołków:\n";
-    for (int i = 0; i < N; i++) { //jesli dany wierzcholek nie został jeszcze odwiedzony i ma dodanych do plecaka wszystkich poprzedników
-        if(!visited[i] && allPrevsAdded(prevG[i], added)) {
+    //std::cout << "Tworzenie zbioru dopuszczalnych wierzchołków:\n";
+    for (int i = 0; i < N; i++) { //jesli dany wierzcholek nie został jeszcze odwiedzony i ma dodanych do plecaka wszystkich poprzedników i sie miesci w plecaku
+        if(!visited[i] && allPrevsAdded(prevG[i], added) && items[i].weight < capacity) {
             accVer.push_back(i);
         }    
     }
     showVer(accVer);
 }
 
-void addToKnapsack(int &capacity, const std::vector<item> items, std::vector<bool> &added, int I, int &finalValue, antGraph *G) {
+void addToKnapsack(int &capacity, const std::vector<item> items, std::vector<bool> &added, int I, int &bestValue, antGraph *G) {
     if (items[I].weight <= capacity) {
-        std::cout << "Przedmiot " << I << " wszedł do plecaka\n";
+        //std::cout << "Przedmiot " << I << " wszedł do plecaka. Ma wartosc: " << items[I].value << "\n";
         capacity -= items[I].weight;
-        finalValue += items[I].value;
-        G[I].pheromoneLevel += items[I].value;
+        bestValue += items[I].value;
         added[I] = 1;
     }
 }
 
 void antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int,int>> dependencies){
     
-    int iterations = 1, ants = 2, currentItem = -1, finalValue, capacity;
+    int iterations = 1, ants = 2, currentItem = -1, bestProfit, currProfit, capacity, finalProfit;
+    double evaporationRate = 0.9;
     Result result(N);
     
     antGraph *G;
@@ -61,54 +61,70 @@ void antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int
     std::vector<std::vector<int>> prevG(N); 
     std::vector<int> acceptableVertices;
     antGraphCreate(G, prevG, items, dependencies);
+    for (int i = 0; i < N; i++) {
+        G[i].pheromoneLevel = 1.0;
+        G[i].attractiveness = (double)items[i].value/(double)items[i].weight;
+    }
     pheromoneItemSelector selector;
 
+    std::vector<bool> added(N);
     //isCyclic(G, items, cycles);
 
     int nextItem;
     for (int i = 0; i < iterations; i++) {
-        std::cout << "iteration: " << i <<"\n";
+        bestProfit = 0;
+        std::cout << "iteration: " << i << "\n";
         for(int a = 0; a < ants; a++) {
             std::vector<bool> visited(N);
-            std::vector<bool> added(N);
-            finalValue  = 0;
+            for (int j = 0; j < N; j++) {
+                added[i] = 0; //nic nie jest dodane jak mrowka przechodzi
+            }
+            currProfit  = 0;
             std::cout << "ant = " << a << "\n";
             capacity = B;
-            possibleVertices(prevG, acceptableVertices, visited, added);
-            //showVer(acceptableVertices);
-            selector.adjust(G, acceptableVertices);
-            //showVer(acceptableVertices);
-            currentItem = selector.selectItem();
-            std::cout << "chosen item: " << acceptableVertices[currentItem] << "\n";
-            addToKnapsack(capacity, items, added, acceptableVertices[currentItem], finalValue, G);
-            visited[acceptableVertices[currentItem]] = 1;
-            bulshow(visited);
             while (capacity > 0) {
                 std::cout << "keeps checking for more items...\n";
-                possibleVertices(prevG, acceptableVertices, visited, added);
+                possibleVertices(capacity, items, prevG, acceptableVertices, visited, added);
                 //showVer(acceptableVertices);
                 if (acceptableVertices.empty()) { //nie ma nic do wybrania juz
+                    std::cout << "Nie ma wiecej potencjalnych przedmiotow\n";
                     break;
                 }
                 selector.adjust(G, acceptableVertices);
                 nextItem = selector.selectItem();
-                addToKnapsack(capacity, items, added, acceptableVertices[nextItem], finalValue, G);
+                //std::cout << "next item: " << acceptableVertices[nextItem] << "\n";
+                addToKnapsack(capacity, items, added, acceptableVertices[nextItem], currProfit, G);
                 
                 visited[acceptableVertices[nextItem]] = 1; //odwiedzony nawet jak nie weszło
-                bulshow(visited);
+                //std::cout << acceptableVertices[nextItem] << "visited? " << visited[acceptableVertices[nextItem]] << "\n";
+                //bulshow(visited);
+                //if (visited)
+            } 
+            if (currProfit > bestProfit) {
+                bestProfit = currProfit;
             }
+            
+            std::cout << "ant = " << a << "\t current profit = " << currProfit << "\n";
 
-
-            std::cout << "Pheromone Levels:\n";
+        }
+        //evaporation mechanism and pheromones update:
+        //tylko te ktore byly uwzglednione w rozwiazaniu
+        if (i == 0) {
+            finalProfit = bestProfit;
+        }
+        for (int f = 0; f < N; f++) {
+            if (added[f]) {
+                G[f].pheromoneLevel *= evaporationRate;
+                std::cout << G[f].pheromoneLevel << " " << (1/(1+(double)(finalProfit-bestProfit)/(double)finalProfit)) <<"\n";
+                G[f].pheromoneLevel += 1/(1+(double)(finalProfit-bestProfit)/(double)finalProfit); ///yyy czy tu jrst git???
+            }
+        }
+        std::cout << "Pheromone Levels:\n"; 
             for (int f = 0; f < N; f++) {
                 std::cout << f << " " << G[f].pheromoneLevel << "\n";
             }
-            std::cout << "ant = " << a << "\t finalValue = " << finalValue << "\n";
-
-        }
-       
-        for (int f = 0; f < N; f++) {
-            G[f].pheromoneLevel *= 0.9;
+        if ((double)bestProfit > finalProfit) {
+            finalProfit = (double)bestProfit;
         }
     }
     delete[] G;

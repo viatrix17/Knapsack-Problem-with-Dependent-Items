@@ -63,9 +63,9 @@ int main(int argc, char *argv[]) {
     Result result(N);
     //result = bruteForce(B, items, dependencies);
     //showResult(result, "Brute Force");
-    result = greedyDependentKnapsack(B, items, dependencies);
-    showResult(result, "Greedy Knapsack");
-    //antAlgorithm(items, dependencies); //bez cykli
+    //result = greedyDependentKnapsack(B, items, dependencies);
+    //showResult(result, "Greedy Knapsack");
+    antAlgorithm(items, dependencies); //bez cykli
     
 }
 
