@@ -5,6 +5,25 @@
 
 int N, B;
 
+void argsCorrect(int argc, char *argv[]) {
+    if (argc <= 0) { 
+        perror("Too few arguments to execute program.");
+        exit(0);
+    }
+    if (std::string(argv[1]) == "AM" && argc < 4) {
+        perror("Too few arguments to execute AM.\n");
+        exit(0);
+    }
+    if (std::string(argv[1]) == "ABF" && argc < 3) {
+        perror("Too few arguments to exectute ABF.");
+        exit(0);
+    }
+    if (std::string(argv[1]) == "AZ" && argc < 3) {
+        perror("Too few arguments to exectute AZ.");
+        exit(0);    
+    }
+}
+
 void showResult(Result result, std::string title) {
     std::cout << title << "\n";
     std::cout << "Max. value: "<< result.value << "\n";
@@ -37,13 +56,13 @@ void showData(std::vector<item> items, std::vector<std::pair<int, int>> dependen
 
 int main(int argc, char *argv[]) {
 
-    if(argc == 1) exit(0);
+    argsCorrect(argc, argv);
     std::string algorithm = std::string(argv[1]);
     std::fstream data;
     
-    data.open(argv[1]);
+    data.open(argv[2]);
 
-    int M; //the capacity of the knapsack and the number of dependencies
+    int M; //the number of dependencies
     data >> N >> B;
 
     std::vector<item> items(N);
@@ -61,12 +80,30 @@ int main(int argc, char *argv[]) {
     //showData(items, dependencies, B, M);
   
     Result result(N);
-    //result = bruteForce(B, items, dependencies);
-    //showResult(result, "Brute Force");
-    //result = greedyDependentKnapsack(B, items, dependencies);
-    //showResult(result, "Greedy Knapsack");
-    antAlgorithm(items, dependencies); //bez cykli
-    
+    if (algorithm == "ABF") {
+        result = bruteForce(B, items, dependencies);
+    }
+    if (algorithm == "AZ") {
+        result = greedyDependentKnapsack(B, items, dependencies);
+    }
+    if (algorithm == "AM") {
+        srand(time(0));
+        std::fstream parameters;
+        int ants, iterations, alfa, beta; //the number of dependencies
+        double evaporationRate;
+        parameters.open(argv[3]);
+        parameters >> iterations;
+        parameters >> ants;
+        parameters >> alfa;
+        parameters >> beta;
+        parameters >> evaporationRate;
+        //std::cout << ants << " " << iterations << " " << alfa << " " << beta << " " << evaporationRate << "\n";
+       
+        result = antAlgorithm(items, dependencies, ants, iterations, alfa, beta, evaporationRate); //bez cykli
+    }
+    showResult(result, algorithm);
+    data.close();
+    return 0;
 }
 
 // plik wyglada tak
@@ -86,5 +123,3 @@ int main(int argc, char *argv[]) {
 // 3 1
 
 
-//GRAFY SORTOWANIE TOPOLOGICZNE -> wykrywanie na samym początku czy jest cykl, wtedy nie ma takiego ustawienia, ale to tylko dziala jesli myslimy o ustawieniu wszystkich przedmiotow
-//grafy wykrywanie sciezki

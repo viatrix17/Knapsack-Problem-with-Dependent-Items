@@ -22,7 +22,7 @@ void showVer(std::vector<int> ver) {
 }
 
 void bulshow(std::vector<bool> ver) {
-    std::cout << "visited:\n";
+    //std::cout << "visited:\n";
     for (int i = 0; i < ver.size(); i++) {
         std::cout << ver[i] << "\n";
     }
@@ -38,7 +38,7 @@ void possibleVertices(int capacity, std::vector<item> items, std::vector<std::ve
             accVer.push_back(i);
         }    
     }
-    showVer(accVer);
+    //showVer(accVer);
 }
 
 void addToKnapsack(int &capacity, const std::vector<item> items, std::vector<bool> &added, int I, int &bestValue, antGraph *G) {
@@ -50,14 +50,14 @@ void addToKnapsack(int &capacity, const std::vector<item> items, std::vector<boo
     }
 }
 
-void antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int,int>> dependencies){
+Result antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int,int>> dependencies, int ants, int iterations, int alfa, int beta, double evaporationRate){
     
-    int iterations = 1, ants = 2, currentItem = -1, bestProfit, currProfit, capacity, finalProfit;
-    double evaporationRate = 0.9;
+    int bestProfit, currProfit, capacity, finalProfit;
     Result result(N);
     
     antGraph *G;
     G = new antGraph[N];
+    
     std::vector<std::vector<int>> prevG(N); 
     std::vector<int> acceptableVertices;
     antGraphCreate(G, prevG, items, dependencies);
@@ -68,67 +68,78 @@ void antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int
     pheromoneItemSelector selector;
 
     std::vector<bool> added(N);
+    std::vector<bool> path(N);
     //isCyclic(G, items, cycles);
 
     int nextItem;
     for (int i = 0; i < iterations; i++) {
         bestProfit = 0;
-        std::cout << "iteration: " << i << "\n";
+        //std::cout << "iteration: " << i << "\n";
         for(int a = 0; a < ants; a++) {
             std::vector<bool> visited(N);
             for (int j = 0; j < N; j++) {
-                added[i] = 0; //nic nie jest dodane jak mrowka przechodzi
+                added[j] = 0; //nic nie jest dodane jak mrowka zaczyna
             }
             currProfit  = 0;
-            std::cout << "ant = " << a << "\n";
+            //std::cout << "ant = " << a << "\n";
             capacity = B;
             while (capacity > 0) {
-                std::cout << "keeps checking for more items...\n";
+                //std::cout << "keeps checking for more items...\n";
                 possibleVertices(capacity, items, prevG, acceptableVertices, visited, added);
                 //showVer(acceptableVertices);
                 if (acceptableVertices.empty()) { //nie ma nic do wybrania juz
-                    std::cout << "Nie ma wiecej potencjalnych przedmiotow\n";
+                    //std::cout << "Nie ma wiecej potencjalnych przedmiotow\n";
                     break;
                 }
-                selector.adjust(G, acceptableVertices);
+                selector.adjust(G, acceptableVertices, alfa, beta, evaporationRate);
                 nextItem = selector.selectItem();
-                //std::cout << "next item: " << acceptableVertices[nextItem] << "\n";
+                //std::cout << "next item: " << nextItem << " " << acceptableVertices[nextItem] << "\n";
                 addToKnapsack(capacity, items, added, acceptableVertices[nextItem], currProfit, G);
                 
                 visited[acceptableVertices[nextItem]] = 1; //odwiedzony nawet jak nie weszło
                 //std::cout << acceptableVertices[nextItem] << "visited? " << visited[acceptableVertices[nextItem]] << "\n";
                 //bulshow(visited);
-                //if (visited)
+                
             } 
             if (currProfit > bestProfit) {
+                path = added;
                 bestProfit = currProfit;
             }
             
-            std::cout << "ant = " << a << "\t current profit = " << currProfit << "\n";
+            //std::cout << "ant = " << a << "\t current profit = " << currProfit << "\t best profit in this iteration: " << bestProfit << "\n";
+            //bulshow(path);
 
         }
         //evaporation mechanism and pheromones update:
         //tylko te ktore byly uwzglednione w rozwiazaniu
         if (i == 0) {
             finalProfit = bestProfit;
+            result.arr = path;
         }
         for (int f = 0; f < N; f++) {
-            if (added[f]) {
+            if (path[f]) {
                 G[f].pheromoneLevel *= evaporationRate;
-                std::cout << G[f].pheromoneLevel << " " << (1/(1+(double)(finalProfit-bestProfit)/(double)finalProfit)) <<"\n";
+                //std::cout << G[f].pheromoneLevel << " " << (1/(1+(double)(finalProfit-bestProfit)/(double)finalProfit)) <<"\n";
                 G[f].pheromoneLevel += 1/(1+(double)(finalProfit-bestProfit)/(double)finalProfit); ///yyy czy tu jrst git???
             }
         }
-        std::cout << "Pheromone Levels:\n"; 
-            for (int f = 0; f < N; f++) {
-                std::cout << f << " " << G[f].pheromoneLevel << "\n";
-            }
-        if ((double)bestProfit > finalProfit) {
-            finalProfit = (double)bestProfit;
+        // std::cout << "Pheromone Levels:\n"; 
+        //     for (int f = 0; f < N; f++) {
+        //         std::cout << f << " " << G[f].pheromoneLevel << "\n";
+        //     }
+        //std::cout << bestProfit << " " << finalProfit << "\n";
+        if (bestProfit > finalProfit) {
+            finalProfit = bestProfit;
+            //std::cout << "final: " << finalProfit << "\n";
+            result.arr = path;
         }
     }
+
+    //std::cout << finalProfit << "\n";
+    //bulshow(path);
     delete[] G;
-    //return result;
+    result.value = finalProfit;
+    return result;
 }
 
 //ewentualnie jeszcze dac set, do ktorego wrzucane są potencjalne wierzcholki, zeby nie usuwac calosci, tylko usuwac ten ktory został odwiedzony

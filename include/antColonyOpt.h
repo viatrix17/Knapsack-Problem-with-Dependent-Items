@@ -1,5 +1,5 @@
 #include "define_include.h"
 
-void antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies);
+Result antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, int ants, int iterations, int alfa, int beta, double evaporationRate);
 
 bool allPrevsAdded(std::vector<int> vertice, std::vector<bool> added);

@@ -1,6 +1,7 @@
 #include "../include/define_include.h"
 
-extern int N;
+extern int N; //przechod po grafie wszerz, jak sie mie miesci, to nie idz dalej, tylko trzeba wygenerowca wszyskie mozliwe bfsy a nie w porzadku leksykograficznym
+//mozna zrobic odcinanie juz na poziomie generacji,ze jak w ktoryms momencie przekracza wage 
 
 std::vector<bool> checkPermutation(int n, int capacity, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, std::vector<int> subset, bool & check) {
 
@@ -9,9 +10,14 @@ std::vector<bool> checkPermutation(int n, int capacity, const std::vector<item> 
     int tempWeight;
     std::vector<bool> solution(N);
     for(long unsigned int i = 0; i < dependencies.size(); i++) { //sprawdzic wszystkie warunki
-        auto pos1 = std::find(subset.begin(), subset.end(), dependencies[i].second-1); 
-        auto pos2 = std::find(subset.begin(), subset.end(), dependencies[i].first-1);  //3 nie moze byc przed 1 i 4 przed 2
-        if (pos1 > pos2 && pos1 != subset.end() && pos2 != subset.end()) {                
+        auto pos1 = std::find(subset.begin(), subset.end(), dependencies[i].second-1); //second - to co przed; first - to co po
+        auto pos2 = std::find(subset.begin(), subset.end(), dependencies[i].first-1);  //3 nie moze byc przed 1 i 4 przed 2 
+        std::cout << "positions: " << *pos1 << " " << *pos2 << "\n";
+        if (pos1 > pos2 && pos1 != subset.end() && pos2 != subset.end()) {    //jezeli jest na odwrot i oba są            
+            valid = false;
+            break;
+        }
+        if (pos1 == subset.end() && pos2 != subset.end()) { //jezeli pierwszego w ogole nie ma w permutacji, to drugie nie moze byc
             valid = false;
             break;
         }
@@ -24,12 +30,12 @@ std::vector<bool> checkPermutation(int n, int capacity, const std::vector<item> 
                 
         if (tempWeight <= capacity) { 
             check = true;
-            //std::cout << "Valid permutation: ";
+            std::cout << "Valid permutation: ";
             for (int idx : subset) {
-                //std::cout << idx-1 << " ";
+                std::cout << idx-1 << " ";
                 solution[idx-1] = 1;
             }
-            //std::cout << "\n";
+            std::cout << "\n";
         }
     }
     
@@ -46,17 +52,22 @@ Result bruteForce(int capacity, const std::vector<item> items, const std::vector
     std::vector<bool> tempSolution(N);
     for(int i = 0; i < N; i++) {
         indices.push_back(i);
+        std::cout << indices[i] << " ";
     }
+    std::cout << "\n";
     for (int length = 1; length <= N; ++length) {
         std::vector<bool> v(indices.size());
         std::fill(v.begin(), v.begin() + length, true);
 
         do {
             std::vector<int> subset;
+            std::cout << "subset:\n";
             for (long unsigned int i = 0; i < indices.size(); ++i) {
                 if (v[i]) {
                     subset.push_back(indices[i]);
+                    std::cout << subset[i] << " ";
                 }
+                std::cout << "\n";
             }
             
             // Sortujemy podzbiór, aby uzyskać permutacje w porządku leksykograficznym
@@ -85,3 +96,9 @@ Result bruteForce(int capacity, const std::vector<item> items, const std::vector
 
     return result;
 }
+
+Result bfzodeciciami() {
+    Result result(N);
+    return result;
+}
+
