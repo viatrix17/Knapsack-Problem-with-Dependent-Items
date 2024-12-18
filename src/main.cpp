@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
         data >> items[i].number >> items[i].weight >> items[i].value;
     }
 
-    //wycztywanie zależności
+    //wczytywanie zależności
     data >> M;
     std::vector<std::pair<int, int>> dependencies(M);
     for (int i = 0; i < M; i++) {
@@ -100,6 +100,7 @@ int main(int argc, char *argv[]) {
         //std::cout << ants << " " << iterations << " " << alfa << " " << beta << " " << evaporationRate << "\n";
        
         result = antAlgorithm(items, dependencies, ants, iterations, alfa, beta, evaporationRate); //bez cykli
+        parameters.close();
     }
     showResult(result, algorithm);
     data.close();

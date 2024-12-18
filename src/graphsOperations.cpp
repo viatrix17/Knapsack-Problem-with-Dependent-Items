@@ -4,11 +4,11 @@
 extern int N; //liczba wierzchołków
 
 void antGraphCreate(antGraph *G, std::vector<std::vector<int>> &prevG, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
-    std::cout << "Tworzenie grafów:\nDodawanie feromonów początkowych:\n";
+   // std::cout << "Tworzenie grafów:\nDodawanie feromonów początkowych:\n";
     for (long unsigned int i = 0; i < items.size(); i++) {
         G[i].pheromoneLevel = 1.0;
     }
-    std::cout << "Dodawanie krawędzi:\n";
+    //std::cout << "Dodawanie krawędzi:\n";
     for (long unsigned int i = 0; i < dependencies.size(); i++) {
         //std::cout << i << "\t\t" << dependencies[i].second << " " << items[dependencies[i].second-1].number << "\t" << dependencies[i].first << " " << items[dependencies[i].first-1].number << "\n";
         G[dependencies[i].second-1].n.push_back(dependencies[i].first-1);
