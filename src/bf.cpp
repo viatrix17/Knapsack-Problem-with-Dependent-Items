@@ -1,5 +1,7 @@
 #include "../include/define_include.h"
+#include "../include/graphsOperations.h"
 
+extern int B;
 extern int N; //przechod po grafie wszerz, jak sie mie miesci, to nie idz dalej, tylko trzeba wygenerowca wszyskie mozliwe bfsy a nie w porzadku leksykograficznym
 //mozna zrobic odcinanie juz na poziomie generacji,ze jak w ktoryms momencie przekracza wage 
 
@@ -97,8 +99,67 @@ Result bruteForce(int capacity, const std::vector<item> items, const std::vector
     return result;
 }
 
-Result bfzodeciciami() {
+void tryAddingItem(int currentItem, int capacity, int profit, int &maxProfit, std::vector<std::vector<int>> prevG, std::vector<bool> visited, std::vector<bool> added, const std::vector<item> items, Result &result) {
+    //std::cout << "Try Adding " << currentItem << "\t" << items[currentItem].weight << "\n" << "current capacity: " << capacity << "\n";
+    //wchodzi do rekurencyji i jest odwiedzony, wychodzi to tak jak gdybysmy go nie wlozyli
+    // for (int i = 0; i < N; i++) {
+    //     if (added[i]) {
+    //         std::cout << i+1 << " ";
+    //     }
+    // }
+    if (items[currentItem].weight <= capacity && allPrevsAdded(prevG[currentItem], added) && !visited[currentItem]) {
+        visited[currentItem] = 1;
+        //jesli wejdzie, to jest dodany
+        added[currentItem] = 1;
+        if (profit + items[currentItem].value > maxProfit) {
+            maxProfit = profit + items[currentItem].value;
+            result.arr = added;
+        }
+        for (int i = 0; i < N; i++) {
+            tryAddingItem(i, capacity - items[currentItem].weight, profit + items[currentItem].value, maxProfit, prevG, visited, added, items, result);
+        }
+    }
+    visited[currentItem] = 0;
+}
+Result bfCutsOff(const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
+    
     Result result(N);
+    std::vector<std::vector<int>> prevG(N);
+    
+    graph *G; 
+    G = new graph[N];
+    createGraph(G, prevG, items, dependencies);
+
+    // for(int i = 0; i < N;i++) {
+    //     std::cout << i << ": ";
+    //     for(int j =0; j < prevG[i].size(); j++) {
+    //         std::cout << prevG[i][j] << " " ;
+    //     }
+    //     std::cout << "\n";
+    // }
+    std::vector<bool> visited(N);
+    std::vector<bool> added(N);
+
+    int capacity, profit, maxProfit = 0;
+
+    for (int i = 0; i < N; i++) {
+        capacity = B;
+        profit = 0;
+        for (int j = 0; j < N; j++) {
+            visited[j] = 0;
+        }
+        tryAddingItem(i, capacity, profit, maxProfit, prevG, visited, added, items, result);
+        // std::cout << "ok\n";
+        // for(int j = 0; j < N; j++) {
+        //     if(result.arr[j]) {
+        //         std::cout << j+1 << " ";
+        //     }
+        // }
+        // std::cout << "\n";
+    }
+    result.value = maxProfit;
+    delete[] G;
+    //rekurencyjnie robic permutacje i sprawdzac czy cos wejdzie, jak nie miesci sie w plecaku to koniec sciezki
     return result;
 }
 

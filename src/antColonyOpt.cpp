@@ -4,15 +4,6 @@
 int extern N;
 int extern B;
 
-bool allPrevsAdded(std::vector<int> vertice, std::vector<bool> added) {
-    for (int i = 0; i < vertice.size(); i++) {
-        if (!added[vertice[i]]) {
-            return false;
-        }
-    }
-    return true;
-}
-
 void showVer(std::vector<int> ver) {
     std::cout << "Acceptable Vertices:\n";
     for (int i = 0; i < ver.size(); i++) {

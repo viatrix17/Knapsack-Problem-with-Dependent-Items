@@ -100,6 +100,16 @@ void show(graph *G, int len){
     }  
 }
 
+bool allPrevsAdded(std::vector<int> vertice, std::vector<bool> added) {
+
+    for (int i = 0; i < vertice.size(); i++) {
+        if (!added[vertice[i]]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void deleteSuccessor(graph *oldG, int ver, std::vector<std::pair<bool,int>> &visited) {
     
     int nextVer;

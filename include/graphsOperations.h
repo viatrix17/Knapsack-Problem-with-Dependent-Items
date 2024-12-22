@@ -13,3 +13,5 @@ graph *transformGraph(graph *oldG, std::set<std::set<item>> &cycles);
 void deleteCycles(graph *oldG, std::vector<std::vector<int>> &prevOld, std::set<std::set<item>> &cycles);
 
 void show(graph *G, int size);
+
+bool allPrevsAdded(std::vector<int> vertice, std::vector<bool> added);

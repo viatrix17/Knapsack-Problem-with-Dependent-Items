@@ -56,6 +56,7 @@ void showData(std::vector<item> items, std::vector<std::pair<int, int>> dependen
 
 int main(int argc, char *argv[]) {
 
+    std::cout << "weszlo\n";
     argsCorrect(argc, argv);
     std::string algorithm = std::string(argv[1]);
     std::fstream data;
@@ -78,13 +79,18 @@ int main(int argc, char *argv[]) {
     }
 
     //showData(items, dependencies, B, M);
-  
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime, stopTime;
     Result result(N);
     if (algorithm == "ABF") {
-        result = bruteForce(B, items, dependencies);
+        std::cout << "Brute Froce\n";
+        
+        result = bfCutsOff(items, dependencies);
+        stopTime = std::chrono::high_resolution_clock::now();
     }
     if (algorithm == "AZ") {
+        startTime = std::chrono::high_resolution_clock::now();
         result = greedyDependentKnapsack(B, items, dependencies);
+        stopTime = std::chrono::high_resolution_clock::now();
     }
     if (algorithm == "AM") {
         srand(time(0));
@@ -98,11 +104,14 @@ int main(int argc, char *argv[]) {
         parameters >> beta;
         parameters >> evaporationRate;
         //std::cout << ants << " " << iterations << " " << alfa << " " << beta << " " << evaporationRate << "\n";
-       
+        startTime = std::chrono::high_resolution_clock::now();
         result = antAlgorithm(items, dependencies, ants, iterations, alfa, beta, evaporationRate); //bez cykli
         parameters.close();
+        stopTime = std::chrono::high_resolution_clock::now();
     }
     showResult(result, algorithm);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stopTime - startTime);
+    std::cout << "Time:" << duration.count() << "\n";
     data.close();
     return 0;
 }
