@@ -121,8 +121,9 @@ void tryAddingItem(int currentItem, int capacity, int profit, int &maxProfit, st
     }
     visited[currentItem] = 0;
 }
-Result bfCutsOff(const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
+Result bfCutsOff(const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, std::chrono::time_point<std::chrono::high_resolution_clock> startTime, std::chrono::time_point<std::chrono::high_resolution_clock> stopTime) {
     
+    startTime = std::chrono::high_resolution_clock::now();
     Result result(N);
     std::vector<std::vector<int>> prevG(N);
     
@@ -159,6 +160,7 @@ Result bfCutsOff(const std::vector<item> items, const std::vector<std::pair<int,
     }
     result.value = maxProfit;
     delete[] G;
+    stopTime = std::chrono::high_resolution_clock::now();
     //rekurencyjnie robic permutacje i sprawdzac czy cos wejdzie, jak nie miesci sie w plecaku to koniec sciezki
     return result;
 }

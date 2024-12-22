@@ -41,7 +41,7 @@ void addToKnapsack(int &capacity, const std::vector<item> items, std::vector<boo
     }
 }
 
-Result antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int,int>> dependencies, int ants, int iterations, int alfa, int beta, double evaporationRate){
+Result antAlgorithm(const std::vector<item> items, const std::vector<std::pair<int,int>> dependencies, int ants, int iterations, int alfa, int beta, double evaporationRate, std::chrono::time_point<std::chrono::high_resolution_clock> startTime, std::chrono::time_point<std::chrono::high_resolution_clock> stopTime){
     
     int bestProfit, currProfit, capacity, finalProfit;
     Result result(N);
@@ -60,9 +60,11 @@ Result antAlgorithm(const std::vector<item> items, const std::vector<std::pair<i
 
     std::vector<bool> added(N);
     std::vector<bool> path(N);
-    //isCyclic(G, items, cycles);
+    
 
     int nextItem;
+
+    startTime = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++) {
         bestProfit = 0;
         //std::cout << "iteration: " << i << "\n";
@@ -130,6 +132,7 @@ Result antAlgorithm(const std::vector<item> items, const std::vector<std::pair<i
     //bulshow(path);
     delete[] G;
     result.value = finalProfit;
+    stopTime = std::chrono::high_resolution_clock::now();
     return result;
 }
 

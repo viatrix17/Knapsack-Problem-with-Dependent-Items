@@ -83,14 +83,10 @@ int main(int argc, char *argv[]) {
     Result result(N);
     if (algorithm == "ABF") {
         std::cout << "Brute Froce\n";
-        
-        result = bfCutsOff(items, dependencies);
-        stopTime = std::chrono::high_resolution_clock::now();
+        result = bfCutsOff(items, dependencies, startTime, stopTime);
     }
     if (algorithm == "AZ") {
-        startTime = std::chrono::high_resolution_clock::now();
-        result = greedyDependentKnapsack(B, items, dependencies);
-        stopTime = std::chrono::high_resolution_clock::now();
+        result = greedyDependentKnapsack(B, items, dependencies, startTime, stopTime);
     }
     if (algorithm == "AM") {
         srand(time(0));
@@ -105,7 +101,7 @@ int main(int argc, char *argv[]) {
         parameters >> evaporationRate;
         //std::cout << ants << " " << iterations << " " << alfa << " " << beta << " " << evaporationRate << "\n";
         startTime = std::chrono::high_resolution_clock::now();
-        result = antAlgorithm(items, dependencies, ants, iterations, alfa, beta, evaporationRate); //bez cykli
+        result = antAlgorithm(items, dependencies, ants, iterations, alfa, beta, evaporationRate, startTime, stopTime); //bez cykli
         parameters.close();
         stopTime = std::chrono::high_resolution_clock::now();
     }

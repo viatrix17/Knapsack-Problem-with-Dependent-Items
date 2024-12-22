@@ -59,7 +59,7 @@ void cyclic(int &capacity, int &finalValue, graph *G, std::vector<std::vector<in
 }
 
 
-Result greedyDependentKnapsack(int capacity, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
+Result greedyDependentKnapsack(int capacity, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, std::chrono::time_point<std::chrono::high_resolution_clock> startTime, std::chrono::time_point<std::chrono::high_resolution_clock> stopTime) {
     
     Result result(N);
     graph *G, *GCycle;
@@ -100,5 +100,6 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
     
     result.arr = solution; 
     result.value = finalValue;
+    stopTime = std::chrono::high_resolution_clock::now();
     return result;
 }
