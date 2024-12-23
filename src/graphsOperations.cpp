@@ -4,7 +4,7 @@
 extern int N; //liczba wierzchołków
 
 void antGraphCreate(antGraph *G, std::vector<std::vector<int>> &prevG, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies) {
-   // std::cout << "Tworzenie grafów:\nDodawanie feromonów początkowych:\n";
+    //std::cout << "Tworzenie grafów:\nDodawanie feromonów początkowych:\n";
     for (long unsigned int i = 0; i < items.size(); i++) {
         G[i].pheromoneLevel = 1.0;
     }
@@ -49,7 +49,7 @@ bool dfsFindCycle(graph *L, int V, int W, std::stack<int> &S, bool *visited)
 
 void isCyclic(graph *L, const std::vector<item> items, std::set<std::set<item>> &cycles) {
 
-    std::cout << "Sprawdzanie czy jest cykl:\n";
+    //std::cout << "Sprawdzanie czy jest cykl:\n";
     std::stack <int> S, T;
     std::set<item> sSet;
     bool *visited;
@@ -68,24 +68,25 @@ void isCyclic(graph *L, const std::vector<item> items, std::set<std::set<item>> 
                 S.pop();
             }
             while (!T.empty()) {
-                //std::cout << "v: " << T.top() << " ";
+               // std::cout << T.top() << " ";
                 sSet.insert(items[T.top()]);
                 T.pop();
             }
-            //std::cout << "\n";
+            
+
             cycles.insert(sSet);
         }
     }
     for (int j = 0; j < N; j++) {
         visited[j] = 0;
     }
-    for (std::set<std::set<item>>::iterator it = cycles.begin(); it != cycles.end(); it++) {
-        std::cout << "numer cyklu: " << 0 << "\n";
-        for (std::set<item>::iterator vertice = it->begin(); vertice != it->end(); vertice++) {
-            std::cout << vertice->number << " ";
-        }
-        std::cout << "\n";
-    }
+    // for (std::set<std::set<item>>::iterator it = cycles.begin(); it != cycles.end(); it++) {
+    //     std::cout << "numer cyklu: " << 0 << "\n";
+    //     for (std::set<item>::iterator vertice = it->begin(); vertice != it->end(); vertice++) {
+    //         std::cout << vertice->number << " ";
+    //     }
+    //     std::cout << "\n";
+    // }
     //łączenie cykli
     delete[] visited;
 }
@@ -130,7 +131,7 @@ void deleteSuccessor(graph *oldG, int ver, std::vector<std::pair<bool,int>> &vis
 
 void deleteCycles(graph *oldG, std::vector<std::vector<int>> &prevOld, std::set<std::set<item>> &cycles) {
     
-    std::cout << "usuwanie cyklu i jego nastepnikow\n";
+    //std::cout << "usuwanie cyklu i jego nastepnikow\n";
     int pom;
     std::vector<std::pair<bool,int>> visited(N);
     for (int i = 0; i < N; i++) {
@@ -139,13 +140,14 @@ void deleteCycles(graph *oldG, std::vector<std::vector<int>> &prevOld, std::set<
     }
     for (std::set<std::set<item>>::iterator it = cycles.begin(); it != cycles.end(); it++) {
         for (std::set<item>::iterator vertice = it->begin(); vertice != it->end(); vertice++) { //idzie po wierzcholkach w cyklu
-            //std::cout << "vertice in a cycle: " << vertice->number-1 << "\n";
+           // std::cout << vertice->number-1 << " ";
             visited[vertice->number-1].first = 1;
             visited[vertice->number-1].second = pom;
             oldG[vertice->number-1].weight = 0;
             oldG[vertice->number-1].value  = 0;
             
         }
+        //std::cout << "\n";
         pom++;
     }
 
@@ -246,7 +248,7 @@ graph *transformGraph(graph *oldG, std::set<std::set<item>> &cycles) {
 
 std::vector<int> topologicalSort (int size, graph *G, const std::vector<item> items) { //jak zroebic zeby nie zmienialo wartosci wskaznik hmm??
     
-    std::cout << "Sortowanie: " << size << "\n";
+    //std::cout << "Sortowanie: " << size << "\n";
 
     std::vector <int> sortedGraph;
 
@@ -261,9 +263,16 @@ std::vector<int> topologicalSort (int size, graph *G, const std::vector<item> it
         if (!gCopy[i].next.empty()) {
             if (gCopy[i].next[0] != -1) {
                 for (int j = 0; j < gCopy[i].next.size(); j++) {
-                    if (gCopy[j].next[0] != -1) {
+                    if (!gCopy[j].next.empty()) {
+                        if (gCopy[j].next[0] != -1) {
+                            ins[gCopy[i].next[j]]++;
+                            inCount++;
+                        }
+                    }
+                    else if (gCopy[j].next.empty()) {
                         ins[gCopy[i].next[j]]++;
                         inCount++;
+
                     }
                 }
             }
@@ -274,7 +283,10 @@ std::vector<int> topologicalSort (int size, graph *G, const std::vector<item> it
         }
        
     }
-
+    // for (int i =0;i<size;i++){
+    //     std::cout << i << " " <<ins[i] << "\n";
+    // }
+    //std::cout << "hmmm\n";
     int indexRemove;
     double maxRatio;
     while (std::accumulate(visited.begin(), visited.end(), 0) != size) {
@@ -304,7 +316,7 @@ std::vector<int> topologicalSort (int size, graph *G, const std::vector<item> it
     }
     //show(gCopy, size);
     
-    std::cout << "The graph has been sorted successfully (Kahn algorithm):\n";
+    //std::cout << "The graph has been sorted successfully (Kahn algorithm):\n";
     // for (int i = 0; i < sortedGraph.size(); i++) {
     //     std::cout << sortedGraph[i] << " ";
     // }

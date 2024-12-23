@@ -121,9 +121,9 @@ void tryAddingItem(int currentItem, int capacity, int profit, int &maxProfit, st
     }
     visited[currentItem] = 0;
 }
-Result bfCutsOff(const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, std::chrono::time_point<std::chrono::high_resolution_clock> startTime, std::chrono::time_point<std::chrono::high_resolution_clock> stopTime) {
+
+Result bfCutsOff(const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, std::chrono::time_point<std::chrono::high_resolution_clock> &startTime, std::chrono::time_point<std::chrono::high_resolution_clock> &stopTime) {
     
-    startTime = std::chrono::high_resolution_clock::now();
     Result result(N);
     std::vector<std::vector<int>> prevG(N);
     
@@ -142,7 +142,7 @@ Result bfCutsOff(const std::vector<item> items, const std::vector<std::pair<int,
     std::vector<bool> added(N);
 
     int capacity, profit, maxProfit = 0;
-
+    startTime = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < N; i++) {
         capacity = B;
         profit = 0;

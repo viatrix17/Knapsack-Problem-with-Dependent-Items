@@ -7,19 +7,23 @@ int N, B;
 
 void argsCorrect(int argc, char *argv[]) {
     if (argc <= 0) { 
-        perror("Too few arguments to execute program.");
+        std::cout << "Too few arguments to execute program.\nExiting the program...\n";
+        exit(0);
+    }
+    if (std::string(argv[1]) != "AM" && std::string(argv[1]) != "ABF" && std::string(argv[1]) != "AZ") {
+        std::cout << "Wrong algorithm.\nExiting the program...\n";
         exit(0);
     }
     if (std::string(argv[1]) == "AM" && argc < 4) {
-        perror("Too few arguments to execute AM.\n");
+        std::cout << "Too few arguments to execute AM.\nExiting the program...\n";
         exit(0);
     }
     if (std::string(argv[1]) == "ABF" && argc < 3) {
-        perror("Too few arguments to exectute ABF.");
+        std::cout << "Too few arguments to exectute ABF.\nExiting the program...\n";
         exit(0);
     }
     if (std::string(argv[1]) == "AZ" && argc < 3) {
-        perror("Too few arguments to exectute AZ.");
+        std::cout << "Too few arguments to exectute AZ.\nExiting the program...\n";
         exit(0);    
     }
 }
@@ -56,7 +60,6 @@ void showData(std::vector<item> items, std::vector<std::pair<int, int>> dependen
 
 int main(int argc, char *argv[]) {
 
-    std::cout << "weszlo\n";
     argsCorrect(argc, argv);
     std::string algorithm = std::string(argv[1]);
     std::fstream data;
@@ -82,7 +85,6 @@ int main(int argc, char *argv[]) {
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime, stopTime;
     Result result(N);
     if (algorithm == "ABF") {
-        std::cout << "Brute Froce\n";
         result = bfCutsOff(items, dependencies, startTime, stopTime);
     }
     if (algorithm == "AZ") {
@@ -100,10 +102,8 @@ int main(int argc, char *argv[]) {
         parameters >> beta;
         parameters >> evaporationRate;
         //std::cout << ants << " " << iterations << " " << alfa << " " << beta << " " << evaporationRate << "\n";
-        startTime = std::chrono::high_resolution_clock::now();
         result = antAlgorithm(items, dependencies, ants, iterations, alfa, beta, evaporationRate, startTime, stopTime); //bez cykli
         parameters.close();
-        stopTime = std::chrono::high_resolution_clock::now();
     }
     showResult(result, algorithm);
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stopTime - startTime);

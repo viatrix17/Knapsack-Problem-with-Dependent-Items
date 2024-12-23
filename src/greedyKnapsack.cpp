@@ -59,7 +59,7 @@ void cyclic(int &capacity, int &finalValue, graph *G, std::vector<std::vector<in
 }
 
 
-Result greedyDependentKnapsack(int capacity, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, std::chrono::time_point<std::chrono::high_resolution_clock> startTime, std::chrono::time_point<std::chrono::high_resolution_clock> stopTime) {
+Result greedyDependentKnapsack(int capacity, const std::vector<item> items, const std::vector<std::pair<int, int>> dependencies, std::chrono::time_point<std::chrono::high_resolution_clock> &startTime, std::chrono::time_point<std::chrono::high_resolution_clock> &stopTime) {
     
     Result result(N);
     graph *G, *GCycle;
@@ -69,21 +69,24 @@ Result greedyDependentKnapsack(int capacity, const std::vector<item> items, cons
     std::vector<int> perm;
     std::set<std::set<item>> cycles; //numer nowego wierzcholka to N+i
     createGraph(G, prevG, items, dependencies);
-    std::cout << "Graph was created\n";
+    //std::cout << "Graph was created\n";
+    //show(G,N);
      
+    startTime = std::chrono::high_resolution_clock::now();
     isCyclic(G, items, cycles);
-    std::cout << "Wyszukiwanie cykli zakończone\n";
+   // std::cout << "Wyszukiwanie cykli zakończone\n";
 
     int pom = 0;
     int finalValue = 0;
     if (!cycles.empty()) {
-        std::cout << "Graf jest cykliczny.\n";
+       // std::cout << "Graf jest cykliczny.\n";
         //zmienia graf tak ze wywala te wierzcholki z cykli i ich nastepnikow
         deleteCycles(G, prevG, cycles);
     }
-    else { 
-        std::cout << "Graf jest acykliczny\n";
-    }
+    // else { 
+    //     std::cout << "Graf jest acykliczny\n";
+    // }
+    //std::cout <<"hm\n";
     perm = topologicalSort(N, G, items); 
     std::vector<bool> added(N);
     for (long unsigned int i = 0; i < perm.size(); i++) {
