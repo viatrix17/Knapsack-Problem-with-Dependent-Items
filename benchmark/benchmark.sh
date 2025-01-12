@@ -5,7 +5,7 @@ green=$(tput setaf 2)
 teal=$(tput setaf 6)
 normal=$(tput sgr0)
 
-algorithms=("ABF") #"AZ" "AM" "ABF") #abf dodac pozniej bo sie wywala
+algorithms=("AZ" "AM") # "ABF") #abf dodac pozniej bo sie wywala
 
 par_file="par_file.txt"
 

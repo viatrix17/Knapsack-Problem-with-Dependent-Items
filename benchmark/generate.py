@@ -40,7 +40,7 @@ def write_to_file(f,n,type,capacity):
 
     edges = generate(n,k)
     if type == 2:
-       f.write(f"{bf} {random.randint(int(sum/2),sum)}\n")
+       f.write(f"{bf} {250}\n")
     else:
        f.write(f"{n} {capacity}\n")
 
@@ -55,8 +55,8 @@ def write_to_file(f,n,type,capacity):
 if __name__ == "__main__": 
   #ifCorrectArgs() 
 
-  capacities = [1000, 1500, 2000, 2500, 3000]
-  number_of_items = [100, 150, 200, 250, 300, 350, 400, 450]
+  capacities = [500, 1000, 1500, 2000, 2500, 3000]
+  number_of_items = [100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
   N = 100
  
   for capacity in capacities:
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     write_to_file(f,N,1,capacity)
     f.close()
 
-  for bf in range(3,14):
+  for bf in range(3,18):
       if bf < 10:
         name = "./data/bruteForce/brute0" + str(bf)
       else:
