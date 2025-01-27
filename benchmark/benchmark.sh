@@ -5,7 +5,7 @@ green=$(tput setaf 2)
 teal=$(tput setaf 6)
 normal=$(tput sgr0)
 
-algorithms=("AZ" "AM") # "ABF") #abf dodac pozniej bo sie wywala
+algorithms=("AZ" "AM") #quality testing
 
 par_file="par_file.txt"
 
@@ -27,16 +27,20 @@ EOF
     #printf "$algorithm"
     if [[ $algorithm == "AM" ]] 
     then
+        #printf "ok"
         result=$(/usr/bin/time -f "%S%M" $runcpp $algorithm $input_file $par_file 2>&1 >$tmpFile)
     else
         result=$(/usr/bin/time -f "%S%M" $runcpp $algorithm $input_file 2>&1 >$tmpFile)
     fi
     
-    echo $(cat $tmpFile)
-    time=$(cat $tmpFile | tr ' ' '\n' | grep "Time" )
-    time=$(echo $time | cut -c 6-)
-    result_file_name=$(echo "$algorithm")Time.csv
-    echo "$instance_size,$time" >> $result_file_name
+    #echo $(cat $tmpFile)
+    #time=$(cat $tmpFile | tr ' ' '\n' | grep "Time" )
+    #time=$(echo $time | cut -c 6-)
+    value=$(cat $tmpFile | grep "value" )
+    value=$(echo $value | cut -c 12-)
+
+    result_file_name=$(echo "$algorithm")Quality.csv #Time.csv
+    echo "$instance_size,$value" >> $result_file_name
     cat > $tmpLogFile <<EOF
 
 $(cat $tmpFile)
@@ -50,32 +54,46 @@ EOF
 
 }
 
-for algorithm in "${algorithms[@]}"; do
-    if [[ $algorithm == "ABF" ]]
-    then
+time_testing() {
+    for algorithm in "${algorithms[@]}"; do
+        if [[ $algorithm == "ABF" ]]
+        then
+            for input_file in "data/bruteForce"/*; do #tu rozbic na te trzy foldery
+                instance_size=$(echo $input_file)
+                instance_size=$(echo $instance_size | cut -c 22-)
+                benchmark $instance_size $input_file $algorithm $input_file $par_file
+            done
+            echo >> $result_file_name
+        else
+            for input_file in "data/diffNumber"/*; do 
+                instance_size=$(echo $input_file)
+                instance_size=$(echo $instance_size | cut -c 22-)
+
+                benchmark $instance_size $input_file $algorithm $input_file $par_file
+            done
+            echo >> $result_file_name
+
+            for input_file in "data/diffCapacity"/*; do 
+                instance_size=$(echo $input_file)
+                instance_size=$(echo $instance_size | cut -c 27-)
+       
+                benchmark $instance_size $input_file $algorithm $input_file $par_file
+            done
+            echo >> $result_file_name
+        fi
+    done
+
+}
+
+quality_testing() {
+    for algorithm in "${algorithms[@]}"; do
         for input_file in "data/bruteForce"/*; do #tu rozbic na te trzy foldery
             instance_size=$(echo $input_file)
             instance_size=$(echo $instance_size | cut -c 22-)
             benchmark $instance_size $input_file $algorithm $input_file $par_file
         done
         echo >> $result_file_name
-    else
-        for input_file in "data/diffNumber"/*; do 
-            instance_size=$(echo $input_file)
-            instance_size=$(echo $instance_size | cut -c 22-)
-        #printf "$instance_size"
-            benchmark $instance_size $input_file $algorithm $input_file $par_file
-        done
-        echo >> $result_file_name
+    done
+}
 
-        for input_file in "data/diffCapacity"/*; do 
-            instance_size=$(echo $input_file)
-            instance_size=$(echo $instance_size | cut -c 27-)
-        #printf "$instance_size"
-            benchmark $instance_size $input_file $algorithm $input_file $par_file
-        done
-        echo >> $result_file_name
-    fi
-done
-
-
+quality_testing
